@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laptop Details - Gear4Rent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e293b',
+                        accent: '#f59e0b',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 font-sans antialiased text-slate-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer"
+                    onclick="window.location.href='index.html'">
+                    <i class="fa-solid fa-laptop-code text-primary text-2xl"></i>
+                    <span class="font-bold text-xl tracking-tight text-secondary">Gear4Rent</span>
+                </div>
+                <div id="auth-buttons" class="hidden md:flex items-center gap-4">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Details Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8 text-sm text-gray-500">
+            <a href="index.html" class="hover:text-primary transition">Home</a>
+            <span class="mx-2">/</span>
+            <a href="index.html#laptops" class="hover:text-primary transition">Laptops</a>
+            <span class="mx-2">/</span>
+            <span id="breadcrumb-model" class="text-gray-800 font-medium">Loading...</span>
+        </nav>
+
+        <div id="loading-spinner" class="text-center py-20">
+            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary mb-4"></i>
+            <p class="text-gray-500">Loading laptop details...</p>
+        </div>
+
+        <div id="product-container" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Left: Image Gallery -->
+            <div class="bg-white rounded-3xl p-4 shadow-sm border border-gray-100">
+                <div class="aspect-w-4 aspect-h-3 rounded-2xl overflow-hidden bg-gray-100 mb-4 h-[400px]">
+                    <img id="main-image" src="" alt="Laptop Image" class="w-full h-full object-cover">
+                </div>
+                <!-- Thumbnails (Optional) -->
+                <div class="grid grid-cols-4 gap-4">
+                    <!-- Placeholder thumbnails if we had more images -->
+                </div>
+            </div>
+
+            <!-- Right: Details -->
+            <div>
+                <div class="mb-6">
+                    <span id="detail-brand" class="text-primary font-bold tracking-wide uppercase text-sm">Brand</span>
+                    <h1 id="detail-model" class="text-4xl font-extrabold text-gray-900 mt-2 mb-4 leading-tight">Model
+                        Name</h1>
+                    <div class="flex items-center gap-4 text-sm text-gray-500">
+                        <span id="detail-category"
+                            class="bg-gray-100 px-3 py-1 rounded-full text-gray-700 font-medium">Category</span>
+                        <span class="flex items-center gap-1 text-yellow-500">
+                            <i class="fa-solid fa-star"></i> 4.8 (24 Reviews)
+                        </span>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-6 mb-8">
+                    <div class="flex items-end gap-2 mb-2">
+                        <span id="detail-price" class="text-4xl font-bold text-primary">₹0</span>
+                        <span class="text-gray-500 mb-2">/ per day</span>
+                    </div>
+                    <p class="text-sm text-blue-700">
+                        <i class="fa-solid fa-info-circle mr-1"></i> Special student discount applied.
+                    </p>
+                </div>
+
+                <!-- Specs Grid -->
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Technical Specifications</h3>
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div
+                        class="flex items-start gap-3 p-3 rounded-lg hover:bg-white hover:shadow-sm transition border border-transparent hover:border-gray-100">
+                        <div class="bg-blue-100 text-primary p-2 rounded-lg"><i class="fa-solid fa-microchip"></i></div>
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase">Processor</p>
+                            <p id="spec-cpu" class="font-semibold text-gray-800">M1</p>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-start gap-3 p-3 rounded-lg hover:bg-white hover:shadow-sm transition border border-transparent hover:border-gray-100">
+                        <div class="bg-blue-100 text-primary p-2 rounded-lg"><i class="fa-solid fa-memory"></i></div>
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase">RAM</p>
+                            <p id="spec-ram" class="font-semibold text-gray-800">8GB</p>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-start gap-3 p-3 rounded-lg hover:bg-white hover:shadow-sm transition border border-transparent hover:border-gray-100">
+                        <div class="bg-blue-100 text-primary p-2 rounded-lg"><i class="fa-solid fa-hdd"></i></div>
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase">Storage</p>
+                            <p id="spec-storage" class="font-semibold text-gray-800">256GB SSD</p>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-start gap-3 p-3 rounded-lg hover:bg-white hover:shadow-sm transition border border-transparent hover:border-gray-100">
+                        <div class="bg-blue-100 text-primary p-2 rounded-lg"><i class="fa-brands fa-windows"></i></div>
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase">OS</p>
+                            <p id="spec-os" class="font-semibold text-gray-800">macOS</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="flex flex-col gap-4">
+                    <button id="rent-btn"
+                        class="w-full bg-primary hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-xl shadow-blue-500/20 transition transform hover:-translate-y-1 text-lg flex justify-center items-center gap-2">
+                        <span>Rent This Laptop</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <p class="text-center text-xs text-gray-400">Secure transaction via Gear4Rent. ID Verification
+                        required.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Logic -->
+    <script type="module">
+        import { getLaptopById } from './src/js/db.js';
+        import { monitorAuthState } from './src/js/auth.js';
+        import './src/js/app.js'; // Imports the navbar logic which runs on DOMContentLoaded
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const laptopId = urlParams.get('id');
+
+        let currentUser = null;
+
+        monitorAuthState((user) => {
+            currentUser = user;
+        });
+
+        async function init() {
+            if (!laptopId) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const laptop = await getLaptopById(laptopId);
+
+            if (!laptop) {
+                document.getElementById('loading-spinner').innerHTML = `<p class="text-red-500">Laptop not found.</p>`;
+                return;
+            }
+
+            // Populate UI
+            document.getElementById('breadcrumb-model').textContent = laptop.model;
+            document.getElementById('detail-brand').textContent = laptop.brand;
+            document.getElementById('detail-model').textContent = laptop.model;
+            document.getElementById('detail-category').textContent = laptop.category;
+            document.getElementById('detail-price').textContent = `₹${laptop.price_per_day}`;
+            document.getElementById('main-image').src = laptop.image;
+
+            document.getElementById('spec-cpu').textContent = laptop.specs.processor;
+            document.getElementById('spec-ram').textContent = laptop.specs.ram;
+            document.getElementById('spec-storage').textContent = laptop.specs.storage;
+            // document.getElementById('spec-os').textContent = laptop.specs.os || 'N/A'; // Add OS to DB if needed
+
+            // Handle Availability
+            const rentBtn = document.getElementById('rent-btn');
+            if (!laptop.available) {
+                rentBtn.disabled = true;
+                rentBtn.classList.remove('bg-primary', 'hover:bg-blue-700', 'shadow-blue-500/20');
+                rentBtn.classList.add('bg-gray-300', 'cursor-not-allowed');
+                rentBtn.innerHTML = `<span>Currently Unavailable</span>`;
+            } else {
+                rentBtn.onclick = () => {
+                    if (currentUser) {
+                        window.location.href = `rental-form.html?id=${laptop.id}`;
+                    } else {
+                        // Save return URL
+                        sessionStorage.setItem('redirect_post_login', `rental-form.html?id=${laptop.id}`);
+                        window.location.href = 'login.html';
+                    }
+                };
+            }
+
+            // Show Container
+            document.getElementById('loading-spinner').classList.add('hidden');
+            document.getElementById('product-container').classList.remove('hidden');
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

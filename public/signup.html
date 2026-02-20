@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Gear4Rent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e293b',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 flex items-center justify-center min-h-screen py-12">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-100">
+        <div class="text-center mb-8">
+            <a href="index.html" class="inline-flex items-center gap-2 text-2xl font-bold text-secondary mb-2">
+                <i class="fa-solid fa-laptop-code text-primary"></i> Gear4Rent
+            </a>
+            <h2 class="text-gray-600 text-sm">Join the student rental revolution.</h2>
+        </div>
+
+        <form id="signup-form" class="space-y-4">
+            <!-- Full Name -->
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-user text-gray-400"></i>
+                    </div>
+                    <input type="text" id="name" required
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
+                        placeholder="John Doe">
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-envelope text-gray-400"></i>
+                    </div>
+                    <input type="email" id="email" required
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
+                        placeholder="you@student.edu">
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-lock text-gray-400"></i>
+                    </div>
+                    <input type="password" id="password" required minlength="6"
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition"
+                        placeholder="••••••••">
+                </div>
+            </div>
+
+            <!-- Role Selection -->
+            <div>
+                <label for="role" class="block text-sm font-medium text-gray-700 mb-1">I am a...</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-users text-gray-400"></i>
+                    </div>
+                    <select id="role"
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition bg-white">
+                        <option value="student">Student (Looking to Rent)</option>
+                        <option value="vendor">Vendor (Laptops to Rent Out)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-msg" class="hidden text-red-500 text-sm text-center bg-red-50 p-2 rounded"></div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="signup-btn"
+                class="w-full bg-primary hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2">
+                <span>Create Account</span>
+                <i class="fa-solid fa-user-plus"></i>
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm text-gray-500">
+            Already have an account? <a href="login.html" class="text-primary font-bold hover:underline">Log in</a>
+        </div>
+    </div>
+
+    <!-- Logic -->
+    <script type="module">
+        import { registerUser } from './src/js/auth.js';
+
+        const signupForm = document.getElementById('signup-form');
+        const errorMsg = document.getElementById('error-msg');
+        const signupBtn = document.getElementById('signup-btn');
+
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+
+            // Loading state
+            signupBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Creating Account...';
+            signupBtn.disabled = true;
+            errorMsg.classList.add('hidden');
+
+            const result = await registerUser(email, password, name, role);
+
+            if (result.success) {
+                // Redirect to login or home
+                alert("Account created successfully! Redirecting to login...");
+                window.location.href = 'login.html';
+            } else {
+                errorMsg.textContent = result.error.replace("Firebase: ", "");
+                errorMsg.classList.remove('hidden');
+                signupBtn.innerHTML = `<span>Create Account</span> <i class="fa-solid fa-user-plus"></i>`;
+                signupBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

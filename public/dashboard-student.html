@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - Gear4Rent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#1e293b',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 text-slate-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white sticky top-0 z-50 border-b border-gray-100 mb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <a href="index.html" class="flex items-center gap-2 font-bold text-xl text-secondary">
+                    <i class="fa-solid fa-laptop-code text-primary"></i> Gear4Rent
+                </a>
+                <div class="flex items-center gap-4">
+                    <span id="user-name" class="font-medium text-gray-600">Student</span>
+                    <button id="logout-btn" class="text-sm text-red-600 hover:text-red-800 font-medium">Log Out</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <h1 class="text-2xl font-bold mb-6">My Rentals</h1>
+
+        <div class="grid grid-cols-1 gap-6" id="orders-container">
+            <!-- Loading -->
+            <div class="text-center py-12 text-gray-500">
+                <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i>
+                <p>Loading your orders...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Logic -->
+    <script type="module">
+        import { getOrdersByStudent } from './src/js/db.js';
+        import { monitorAuthState, logoutUser } from './src/js/auth.js';
+
+        let currentUser = null;
+
+        // Auth
+        monitorAuthState(async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = user;
+            document.getElementById('user-name').textContent = user.displayName || user.email;
+            loadOrders();
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => logoutUser());
+
+        async function loadOrders() {
+            const container = document.getElementById('orders-container');
+            const orders = await getOrdersByStudent(currentUser.uid);
+
+            container.innerHTML = '';
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-300">
+                        <i class="fa-solid fa-box-open text-gray-300 text-5xl mb-4"></i>
+                        <p class="text-gray-500 mb-4">You haven't rented any laptops yet.</p>
+                        <a href="index.html#laptops" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition">Browse Laptops</a>
+                    </div>
+                `;
+                return;
+            }
+
+            orders.forEach(order => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6 items-center md:items-start";
+
+                let statusColor = 'bg-yellow-100 text-yellow-800';
+                let statusIcon = 'fa-clock';
+
+                if (order.status === 'approved') {
+                    statusColor = 'bg-green-100 text-green-800';
+                    statusIcon = 'fa-check-circle';
+                } else if (order.status === 'rejected') {
+                    statusColor = 'bg-red-100 text-red-800';
+                    statusIcon = 'fa-times-circle';
+                }
+
+                card.innerHTML = `
+                    <img src="${order.laptopImage || 'https://via.placeholder.com/150'}" class="w-full md:w-32 h-24 object-cover rounded-lg bg-gray-100">
+                    
+                    <div class="flex-grow w-full">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-lg text-gray-900">${order.laptopModel}</h3>
+                            <span class="${statusColor} px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1">
+                                <i class="fa-solid ${statusIcon}"></i> ${order.status}
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 mb-4">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase">Order ID</p>
+                                <p class="font-mono text-xs truncate" title="${order.id}">#${order.id.slice(0, 8)}...</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase">Duration</p>
+                                <p>${order.duration} Days</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase">Start Date</p>
+                                <p>${order.startDate}</p>
+                            </div>
+                             <div>
+                                <p class="text-xs text-gray-400 uppercase">Total Cost</p>
+                                <p class="font-bold text-primary">₹${order.totalPrice}</p>
+                            </div>
+                        </div>
+
+                        <div class="text-xs text-gray-400 bg-gray-50 p-3 rounded-lg">
+                            <i class="fa-solid fa-location-dot mr-1"></i> Delivery to: ${order.address}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+
+</html>
