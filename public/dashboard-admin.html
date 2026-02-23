@@ -67,14 +67,14 @@
 
         monitorAuthState((user, role) => {
             if (!user || role !== 'admin') {
-                // window.location.href = 'index.html'; 
+
             }
             currentUser = user;
             loadOrders();
         });
 
         document.getElementById('logout-btn').addEventListener('click', () => logoutUser());
-        window.loadOrders = loadOrders; // Expose for button
+        window.loadOrders = loadOrders;
 
         async function loadOrders() {
             const tbody = document.getElementById('orders-table-body');
@@ -88,7 +88,7 @@
                 return;
             }
 
-            // Sort by date desc (mock)
+
             orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
             orders.forEach(order => {
@@ -133,14 +133,12 @@
         window.handleStatus = async (orderId, newStatus) => {
             if (!confirm(`Are you sure you want to ${newStatus} this order?`)) return;
 
-            // Optimistic UI update
             document.getElementById(`status-${orderId}`).textContent = newStatus;
             document.getElementById(`status-${orderId}`).className = newStatus === 'approved'
                 ? 'bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-bold uppercase'
                 : 'bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-bold uppercase';
 
             await updateOrderStatus(orderId, newStatus);
-            // Reload to refresh buttons state
             setTimeout(loadOrders, 500);
         };
     </script>

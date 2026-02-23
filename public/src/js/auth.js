@@ -45,9 +45,13 @@ async function loginUser(email, password) {
         // Fetch Role
         let role = 'student'; // Default
         if (db) {
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (userDoc.exists()) {
-                role = userDoc.data().role;
+            try {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    role = userDoc.data().role;
+                }
+            } catch (e) {
+                console.warn("Could not fetch user role from Firestore, defaulting to student:", e.message);
             }
         }
 
