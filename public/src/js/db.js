@@ -9,7 +9,7 @@ const MOCK_LAPTOPS = [
         model: "MacBook Air M1",
         specs: { processor: "M1", ram: "8GB", storage: "256GB SSD" },
         price_per_day: 49,
-        image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwMCIgaGVpZ2h0PSI3MDAiIHZpZXdCb3g9IjAgMCAxMDAwIDcwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEwMDAiIGhlaWdodD0iNzAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5Q0E0QUYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5NYWNCb29rIEFpciBNMTwvdGV4dD4KPC9zdmc+",
+        image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&q=80&w=1000",
         available: true,
         category: "Ultrabook"
     },
@@ -19,7 +19,7 @@ const MOCK_LAPTOPS = [
         model: "XPS 13",
         specs: { processor: "i7 11th Gen", ram: "16GB", storage: "512GB SSD" },
         price_per_day: 59,
-        image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwMCIgaGVpZ2h0PSI3MDAiIHZpZXdCb3g9IjAgMCAxMDAwIDcwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEwMDAiIGhlaWdodD0iNzAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5Q0E0QUYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5EZWxsIFhQUyAxMzwvdGV4dD4KPC9zdmc+",
+        image: "https://images.unsplash.com/photo-1593642632823-8f78536788c6?auto=format&fit=crop&q=80&w=1000",
         available: false,
         category: "Windows Premier"
     },
@@ -29,7 +29,7 @@ const MOCK_LAPTOPS = [
         model: "ThinkPad X1 Carbon",
         specs: { processor: "i7 12th Gen", ram: "16GB", storage: "1TB SSD" },
         price_per_day: 65,
-        image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwMCIgaGVpZ2h0PSI3MDAiIHZpZXdCb3g9IjAgMCAxMDAwIDcwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEwMDAiIGhlaWdodD0iNzAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5Q0E0QUYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5MZW5vdm8gVGhpbmtQYWR4PC90ZXh0Pgo8L3N2Zz4=",
+        image: "https://images.unsplash.com/photo-1588872657578-a3d2e184590c?auto=format&fit=crop&q=80&w=1000",
         available: true,
         category: "Business"
     },
@@ -39,7 +39,7 @@ const MOCK_LAPTOPS = [
         model: "Pavilion 15",
         specs: { processor: "Ryzen 5", ram: "8GB", storage: "512GB SSD" },
         price_per_day: 35,
-        image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwMCIgaGVpZ2h0PSI3MDAiIHZpZXdCb3g9IjAgMCAxMDAwIDcwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEwMDAiIGhlaWdodD0iNzAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5Q0E0QUYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5IEEgUGF2aWxpb24gMTU8L3RleHQ+Cjwvc3ZnPg==",
+        image: "https://images.unsplash.com/photo-1589561276602-fa6372404f18?auto=format&fit=crop&q=80&w=1000",
         available: true,
         category: "Budget Friendly"
     },
@@ -49,7 +49,7 @@ const MOCK_LAPTOPS = [
         model: "ROG Zephyrus G14",
         specs: { processor: "Ryzen 9", ram: "16GB", storage: "1TB SSD" },
         price_per_day: 75,
-        image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwMCIgaGVpZ2h0PSI3MDAiIHZpZXdCb3g9IjAgMCAxMDAwIDcwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEwMDAiIGhlaWdodD0iNzAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5Q0E0QUYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5BU1VTIFJPRyBaZXBoeXJ1czwvdGV4dD4KPC9zdmc+",
+        image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&q=80&w=1000",
         available: true,
         category: "Gaming/High Performance"
     },
@@ -59,7 +59,7 @@ const MOCK_LAPTOPS = [
         model: "Aspire 5",
         specs: { processor: "i5 11th Gen", ram: "8GB", storage: "512GB SSD" },
         price_per_day: 29,
-        image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwMCIgaGVpZ2h0PSI3MDAiIHZpZXdCb3g9IjAgMCAxMDAwIDcwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEwMDAiIGhlaWdodD0iNzAwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM5Q0E0QUYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5BY2VyIEFzcGlyZSA1PC90ZXh0Pgo8L3N2Zz4=",
+        image: "https://images.unsplash.com/photo-1544731612-de7f96afe55f?auto=format&fit=crop&q=80&w=1000",
         available: true,
         category: "Student Essentials"
     }
