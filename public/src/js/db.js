@@ -1,5 +1,6 @@
 import { db } from './firebase-config.js';
-import { collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, where, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, where, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
 // Mock Data for fallback
 const MOCK_LAPTOPS = [
@@ -29,7 +30,7 @@ const MOCK_LAPTOPS = [
         model: "ThinkPad X1 Carbon",
         specs: { processor: "i7 12th Gen", ram: "16GB", storage: "1TB SSD" },
         price_per_day: 65,
-        image: "https://images.unsplash.com/photo-1588872657578-a3d2e184590c?auto=format&fit=crop&q=80&w=1000",
+        image: "https://sm.pcmag.com/pcmag_me/review/l/lenovo-thi/lenovo-thinkpad-x1-carbon-gen-12_zjhe.jpg",
         available: true,
         category: "Business"
     },
@@ -39,7 +40,7 @@ const MOCK_LAPTOPS = [
         model: "Pavilion 15",
         specs: { processor: "Ryzen 5", ram: "8GB", storage: "512GB SSD" },
         price_per_day: 35,
-        image: "https://images.unsplash.com/photo-1589561276602-fa6372404f18?auto=format&fit=crop&q=80&w=1000",
+        image: "https://rewow.in/wp-content/uploads/2025/12/218313-image1_1.jpg",
         available: true,
         category: "Budget Friendly"
     },
@@ -65,7 +66,7 @@ const MOCK_LAPTOPS = [
     }
 ];
 
-// Fetch all laptops
+// Fetch all laptops (one-time)
 async function getLaptops() {
     try {
         if (!db) throw new Error("Database not initialized");
@@ -80,6 +81,28 @@ async function getLaptops() {
         return MOCK_LAPTOPS; // Fallback to mock data
     }
 }
+
+// Real-time listener for laptops — callback fires immediately and on every change
+// Returns the unsubscribe function (call it to stop listening)
+function watchLaptops(callback) {
+    if (!db) {
+        // No DB — just call once with mock data
+        callback(MOCK_LAPTOPS);
+        return () => { };
+    }
+    return onSnapshot(collection(db, "laptops"), (snapshot) => {
+        if (snapshot.empty) {
+            callback(MOCK_LAPTOPS);
+            return;
+        }
+        const laptops = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        callback(laptops);
+    }, (error) => {
+        console.warn("Real-time laptop listener error:", error);
+        callback(MOCK_LAPTOPS);
+    });
+}
+
 
 // Get single laptop by ID
 async function getLaptopById(id) {
@@ -231,8 +254,6 @@ async function updateOrderStatus(orderId, status, laptopId = null) {
         const orderRef = doc(db, "orders", orderId);
         await updateDoc(orderRef, { status: status });
 
-        // Fix #5: Mark laptop available/unavailable based on status
-        // laptopId is passed in directly — no need for a second Firestore read
         if (laptopId) {
             const laptopRef = doc(db, "laptops", laptopId);
             if (status === 'approved') {
@@ -249,7 +270,7 @@ async function updateOrderStatus(orderId, status, laptopId = null) {
     }
 }
 
-export { getLaptops, getLaptopById, createOrder, getOrdersByStudent, addLaptop, getAllOrders, updateOrderStatus, getOrdersByVendor, getLaptopsByVendor, deleteLaptop, MOCK_LAPTOPS };
+export { getLaptops, watchLaptops, getLaptopById, createOrder, getOrdersByStudent, addLaptop, getAllOrders, updateOrderStatus, getOrdersByVendor, getLaptopsByVendor, deleteLaptop, MOCK_LAPTOPS };
 
 
 

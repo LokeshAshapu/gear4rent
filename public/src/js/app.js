@@ -1,13 +1,12 @@
-import { getLaptops } from './db.js';
+import { watchLaptops } from './db.js';
 import { monitorAuthState, logoutUser } from './auth.js';
 
 // DOM Elements
 const laptopGrid = document.getElementById('laptop-grid');
 const authButtons = document.getElementById('auth-buttons');
-const navContainer = document.querySelector('nav .max-w-7xl .flex'); // Select container to append profile info on mobile if needed
 
 // Initialize App
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     // 1. Check Auth State
     monitorAuthState((user, role) => {
         if (user) {
@@ -17,9 +16,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 2. Render Laptops if on home page
+    // 2. Render Laptops with real-time listener (home page only)
     if (laptopGrid) {
-        await renderFeaturedLaptops();
+        // Show loading spinner once
+        laptopGrid.innerHTML = `
+            <div class="col-span-full text-center py-12 text-gray-500">
+                 <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-4 text-primary"></i>
+                 <p>Finding the best gear for you...</p>
+            </div>
+        `;
+
+        // watchLaptops fires immediately on load AND every time any laptop changes in Firestore
+        watchLaptops((laptops) => {
+            renderLaptopGrid(laptops);
+        });
     }
 });
 
@@ -67,27 +77,14 @@ function updateNavForGuest() {
 }
 
 // Render Laptops to Grid
-async function renderFeaturedLaptops() {
-    // Show Loading
-    laptopGrid.innerHTML = `
-        <div class="col-span-full text-center py-12 text-gray-500">
-             <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-4 text-primary"></i>
-             <p>Finding the best gear for you...</p>
-        </div>
-    `;
-
-    // Fetch Data
-    const laptops = await getLaptops();
-
-    // Clear Grid
+function renderLaptopGrid(laptops) {
     laptopGrid.innerHTML = '';
 
-    if (laptops.length === 0) {
+    if (!laptops || laptops.length === 0) {
         laptopGrid.innerHTML = '<p class="text-center col-span-full text-gray-500">No laptops available at the moment.</p>';
         return;
     }
 
-    // Populate Grid
     laptops.forEach(laptop => {
         const card = createLaptopCard(laptop);
         laptopGrid.appendChild(card);
@@ -137,10 +134,14 @@ function createLaptopCard(laptop) {
                      <span class="text-2xl font-bold text-primary">₹${laptop.price_per_day}</span>
                      <span class="text-xs text-gray-400">/day</span>
                 </div>
-                <!-- Pass ID in URL -->
-                <button onclick="window.location.href='laptop-details.html?id=${laptop.id}'" class="bg-secondary hover:bg-black text-white px-5 py-2.5 rounded-lg text-sm font-bold transition shadow-md hover:shadow-lg transform active:scale-95">
-                    View & Rent
-                </button>
+                ${laptop.available
+            ? `<button onclick="window.location.href='laptop-details.html?id=${laptop.id}'" class="bg-secondary hover:bg-black text-white px-5 py-2.5 rounded-lg text-sm font-bold transition shadow-md hover:shadow-lg transform active:scale-95">
+                        View & Rent
+                       </button>`
+            : `<button disabled class="bg-gray-200 text-gray-400 px-5 py-2.5 rounded-lg text-sm font-bold cursor-not-allowed">
+                        Unavailable
+                       </button>`
+        }
             </div>
         </div>
     `;
@@ -148,4 +149,4 @@ function createLaptopCard(laptop) {
 }
 
 // Export for global access if needed
-window.renderFeaturedLaptops = renderFeaturedLaptops;
+window.renderLaptopGrid = renderLaptopGrid;
