@@ -121,10 +121,10 @@
                     <td class="px-6 py-4 text-center">
                         ${order.status === 'pending' ? `
                             <div class="flex justify-center gap-2">
-                                <button onclick="handleStatus('${order.id}', 'approved')" class="bg-green-50 text-green-600 hover:bg-green-100 p-2 rounded-lg transition" title="Approve">
+                                <button onclick="handleStatus('${order.id}', 'approved', '${order.laptopId}')" class="bg-green-50 text-green-600 hover:bg-green-100 p-2 rounded-lg transition" title="Approve">
                                     <i class="fa-solid fa-check"></i>
                                 </button>
-                                <button onclick="handleStatus('${order.id}', 'rejected')" class="bg-red-50 text-red-600 hover:bg-red-100 p-2 rounded-lg transition" title="Reject">
+                                <button onclick="handleStatus('${order.id}', 'rejected', '${order.laptopId}')" class="bg-red-50 text-red-600 hover:bg-red-100 p-2 rounded-lg transition" title="Reject">
                                     <i class="fa-solid fa-times"></i>
                                 </button>
                             </div>
@@ -135,7 +135,7 @@
             });
         }
 
-        window.handleStatus = async (orderId, newStatus) => {
+        window.handleStatus = async (orderId, newStatus, laptopId) => {
             if (!confirm(`Are you sure you want to ${newStatus} this order?`)) return;
 
             document.getElementById(`status-${orderId}`).textContent = newStatus;
@@ -143,7 +143,7 @@
                 ? 'bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-bold uppercase'
                 : 'bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-bold uppercase';
 
-            await updateOrderStatus(orderId, newStatus);
+            await updateOrderStatus(orderId, newStatus, laptopId);
             setTimeout(loadOrders, 500);
         };
     </script>

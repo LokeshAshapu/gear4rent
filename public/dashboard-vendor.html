@@ -302,11 +302,11 @@
 
             const actionButtons = order.status === 'pending' ? `
                 <div class="flex gap-3 mt-4 pt-4 border-t border-gray-100">
-                    <button onclick="handleOrderAction('${order.id}', 'approved')"
+                    <button onclick="handleOrderAction('${order.id}', 'approved', '${order.laptopId}')"
                         class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-check"></i> Approve
                     </button>
-                    <button onclick="handleOrderAction('${order.id}', 'rejected')"
+                    <button onclick="handleOrderAction('${order.id}', 'rejected', '${order.laptopId}')"
                         class="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-2 px-4 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-times"></i> Reject
                     </button>
@@ -355,14 +355,13 @@
         }
 
         // Global handler called by inline onclick
-        window.handleOrderAction = async function (orderId, newStatus) {
+        window.handleOrderAction = async function (orderId, newStatus, laptopId) {
             const card = document.getElementById(`order-card-${orderId}`);
             const buttons = card.querySelectorAll('button[onclick]');
             buttons.forEach(b => { b.disabled = true; b.classList.add('opacity-60'); });
 
-            const result = await updateOrderStatus(orderId, newStatus);
+            const result = await updateOrderStatus(orderId, newStatus, laptopId);
             if (result.success) {
-                // Re-render the card by refreshing the whole list
                 loadRentalRequests();
             } else {
                 alert('Error: ' + result.error);

@@ -225,33 +225,20 @@ async function getAllOrders() {
     }
 }
 
-async function updateOrderStatus(orderId, status) {
+async function updateOrderStatus(orderId, status, laptopId = null) {
     try {
         if (!db) return { success: true };
         const orderRef = doc(db, "orders", orderId);
         await updateDoc(orderRef, { status: status });
 
-        // Fix #5: When an order is approved, mark the laptop as unavailable
-        if (status === 'approved') {
-            const orderSnap = await getDoc(orderRef);
-            if (orderSnap.exists()) {
-                const laptopId = orderSnap.data().laptopId;
-                if (laptopId) {
-                    const laptopRef = doc(db, "laptops", laptopId);
-                    await updateDoc(laptopRef, { available: false });
-                }
-            }
-        }
-
-        // If an order is rejected/cancelled, re-mark the laptop as available
-        if (status === 'rejected') {
-            const orderSnap = await getDoc(orderRef);
-            if (orderSnap.exists()) {
-                const laptopId = orderSnap.data().laptopId;
-                if (laptopId) {
-                    const laptopRef = doc(db, "laptops", laptopId);
-                    await updateDoc(laptopRef, { available: true });
-                }
+        // Fix #5: Mark laptop available/unavailable based on status
+        // laptopId is passed in directly — no need for a second Firestore read
+        if (laptopId) {
+            const laptopRef = doc(db, "laptops", laptopId);
+            if (status === 'approved') {
+                await updateDoc(laptopRef, { available: false });
+            } else if (status === 'rejected') {
+                await updateDoc(laptopRef, { available: true });
             }
         }
 
@@ -263,6 +250,7 @@ async function updateOrderStatus(orderId, status) {
 }
 
 export { getLaptops, getLaptopById, createOrder, getOrdersByStudent, addLaptop, getAllOrders, updateOrderStatus, getOrdersByVendor, getLaptopsByVendor, deleteLaptop, MOCK_LAPTOPS };
+
 
 
 
