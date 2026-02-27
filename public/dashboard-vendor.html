@@ -14,111 +14,470 @@
             }
         }
     </script>
+    <style>
+        .tab-btn.active {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .tab-btn {
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .status-badge-pending {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .status-badge-approved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50 text-slate-800">
 
+    <!-- Navbar -->
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
-            <span class="font-bold text-xl text-secondary">Gear4Rent <span
-                    class="text-xs bg-gray-200 px-2 py-0.5 rounded text-gray-600">VENDOR</span></span>
-            <button id="logout-btn" class="text-red-600 text-sm font-medium">Log Out</button>
+        <div class="max-w-5xl mx-auto px-4 h-16 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-laptop-code text-primary text-xl"></i>
+                <span class="font-bold text-xl text-secondary">Gear4Rent
+                    <span class="text-xs bg-blue-100 text-primary px-2 py-0.5 rounded ml-1">VENDOR</span>
+                </span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="vendor-name" class="text-sm text-gray-500 font-medium"></span>
+                <button id="logout-btn"
+                    class="text-sm text-red-500 hover:text-red-700 font-medium flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+                </button>
+            </div>
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto px-4 py-8">
-        <h1 class="text-2xl font-bold mb-6">Manage Inventory</h1>
+    <main class="max-w-5xl mx-auto px-4 py-8">
 
-        <!-- Add Laptop Form -->
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
-            <h2 class="text-lg font-bold mb-4">Add New Laptop</h2>
-            <form id="add-laptop-form" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
-                        <select id="brand" class="w-full px-3 py-2 border rounded-lg bg-white">
-                            <option>Apple</option>
-                            <option>Dell</option>
-                            <option>HP</option>
-                            <option>Lenovo</option>
-                            <option>ASUS</option>
-                            <option>Acer</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Model Name</label>
-                        <input type="text" id="model" required class="w-full px-3 py-2 border rounded-lg"
-                            placeholder="e.g. MacBook Air M1">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Processor</label>
-                        <input type="text" id="processor" required class="w-full px-3 py-2 border rounded-lg"
-                            placeholder="e.g. M1 / i7">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">RAM</label>
-                        <input type="text" id="ram" required class="w-full px-3 py-2 border rounded-lg"
-                            placeholder="e.g. 16GB">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Storage</label>
-                        <input type="text" id="storage" required class="w-full px-3 py-2 border rounded-lg"
-                            placeholder="e.g. 512GB SSD">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Price Per Day (₹)</label>
-                        <input type="number" id="price" required class="w-full px-3 py-2 border rounded-lg"
-                            placeholder="e.g. 499">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                        <select id="category" class="w-full px-3 py-2 border rounded-lg bg-white">
-                            <option>Ultrabook</option>
-                            <option>Gaming/High Performance</option>
-                            <option>Business</option>
-                            <option>Budget Friendly</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-                    <input type="url" id="image" required class="w-full px-3 py-2 border rounded-lg"
-                        placeholder="https://example.com/image.jpg">
-                    <p class="text-xs text-gray-400 mt-1">For now, please provide a direct image link.</p>
-                </div>
-
-                <button type="submit" id="submit-btn"
-                    class="bg-primary hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition w-full md:w-auto">
-                    List Laptop
-                </button>
-            </form>
+        <!-- Page Title -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-secondary">Vendor Dashboard</h1>
+            <p class="text-sm text-gray-500 mt-1">Manage rental requests and your listed inventory.</p>
         </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
+            <button id="tab-requests" class="tab-btn active px-5 py-2 rounded-lg text-sm font-semibold">
+                <i class="fa-solid fa-bell mr-2"></i>Rental Requests
+            </button>
+            <button id="tab-inventory"
+                class="tab-btn px-5 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-white">
+                <i class="fa-solid fa-boxes-stacked mr-2"></i>My Inventory
+            </button>
+        </div>
+
+        <!-- ======================== TAB 1: Rental Requests ======================== -->
+        <div id="panel-requests" class="tab-panel active">
+
+            <div id="requests-container">
+                <div class="text-center py-16 text-gray-400">
+                    <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i>
+                    <p>Loading rental requests...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================== TAB 2: My Inventory ======================== -->
+        <div id="panel-inventory" class="tab-panel">
+
+            <!-- Add Laptop Form -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-plus-circle text-primary"></i> Add New Laptop
+                </h2>
+                <form id="add-laptop-form" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                            <select id="brand"
+                                class="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-primary outline-none">
+                                <option>Apple</option>
+                                <option>Dell</option>
+                                <option>HP</option>
+                                <option>Lenovo</option>
+                                <option>ASUS</option>
+                                <option>Acer</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Model Name</label>
+                            <input type="text" id="model" required
+                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                placeholder="e.g. MacBook Air M1">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Processor</label>
+                            <input type="text" id="processor" required
+                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                placeholder="e.g. M1 / i7">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">RAM</label>
+                            <input type="text" id="ram" required
+                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                placeholder="e.g. 16GB">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Storage</label>
+                            <input type="text" id="storage" required
+                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                placeholder="e.g. 512GB SSD">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Price Per Day (₹)</label>
+                            <input type="number" id="price" required
+                                class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                placeholder="e.g. 499">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <select id="category"
+                                class="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-primary outline-none">
+                                <option>Ultrabook</option>
+                                <option>Gaming/High Performance</option>
+                                <option>Business</option>
+                                <option>Budget Friendly</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                        <input type="url" id="image" required
+                            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                            placeholder="https://example.com/image.jpg">
+                        <p class="text-xs text-gray-400 mt-1">Please provide a direct image link.</p>
+                    </div>
+
+                    <button type="submit" id="submit-btn"
+                        class="bg-primary hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition w-full md:w-auto">
+                        <i class="fa-solid fa-upload mr-2"></i>List Laptop
+                    </button>
+                </form>
+            </div>
+
+            <!-- My Listed Laptops -->
+            <div>
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-list text-primary"></i> My Listed Laptops
+                </h2>
+                <div id="inventory-container">
+                    <div class="text-center py-10 text-gray-400">
+                        <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i>
+                        <p>Loading inventory...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
+    <!-- Confirm Delete Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-sm text-center shadow-2xl">
+            <div
+                class="w-14 h-14 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-trash"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Delete Listing?</h2>
+            <p class="text-gray-500 text-sm mb-6">This laptop will be permanently removed from the marketplace. Existing
+                orders will not be affected.</p>
+            <div class="flex gap-3">
+                <button id="cancel-delete-btn"
+                    class="flex-1 border border-gray-300 text-gray-700 py-2 rounded-xl font-medium hover:bg-gray-50 transition">Cancel</button>
+                <button id="confirm-delete-btn"
+                    class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl font-medium transition">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
-        import { addLaptop } from './src/js/db.js';
+        import { addLaptop, getLaptops, getOrdersByVendor, updateOrderStatus, deleteLaptop } from './src/js/db.js';
         import { monitorAuthState, logoutUser } from './src/js/auth.js';
 
         let currentUser = null;
+        let laptopToDelete = null;
 
+        // ── Auth ──────────────────────────────────────────────────────────────────
         monitorAuthState((user, role) => {
-            if (!user || role !== 'vendor') {
-                // Redirect if not vendor (simple check)
-                if (user && role === 'admin') return; // Admin can see
-                // window.location.href = 'index.html'; 
+            if (!user) { window.location.href = 'login.html'; return; }
+            if (role !== 'vendor' && role !== 'admin') {
+                window.location.href = 'index.html'; return;
             }
             currentUser = user;
+            document.getElementById('vendor-name').textContent = user.displayName || user.email;
+
+            // Load both panels once auth is ready
+            loadRentalRequests();
+            loadInventory();
         });
 
         document.getElementById('logout-btn').addEventListener('click', () => logoutUser());
 
+        // ── Tab Switching ─────────────────────────────────────────────────────────
+        function switchTab(tabId) {
+            ['requests', 'inventory'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.remove('active');
+                document.getElementById(`tab-${t}`).classList.add('text-gray-600', 'hover:bg-white');
+                document.getElementById(`panel-${t}`).classList.remove('active');
+            });
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            document.getElementById(`tab-${tabId}`).classList.remove('text-gray-600', 'hover:bg-white');
+            document.getElementById(`panel-${tabId}`).classList.add('active');
+        }
+
+        document.getElementById('tab-requests').addEventListener('click', () => switchTab('requests'));
+        document.getElementById('tab-inventory').addEventListener('click', () => switchTab('inventory'));
+
+        // ── RENTAL REQUESTS ───────────────────────────────────────────────────────
+        async function loadRentalRequests() {
+            const container = document.getElementById('requests-container');
+            if (!currentUser) return;
+
+            const orders = await getOrdersByVendor(currentUser.uid);
+            container.innerHTML = '';
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-20 bg-white rounded-2xl border border-dashed border-gray-300">
+                        <i class="fa-solid fa-inbox text-gray-300 text-5xl mb-4"></i>
+                        <p class="text-gray-500 font-medium">No rental requests yet.</p>
+                        <p class="text-gray-400 text-sm mt-1">When students request your laptops, they'll appear here.</p>
+                    </div>`;
+                return;
+            }
+
+            // Sort: pending first
+            orders.sort((a, b) => {
+                const order = ['pending', 'approved', 'rejected'];
+                return order.indexOf(a.status) - order.indexOf(b.status);
+            });
+
+            orders.forEach(order => {
+                const card = createRequestCard(order);
+                container.appendChild(card);
+            });
+        }
+
+        function createRequestCard(order) {
+            const card = document.createElement('div');
+            card.id = `order-card-${order.id}`;
+            card.className = 'bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-4';
+
+            const statusMap = {
+                pending: { cls: 'status-badge-pending', icon: 'fa-clock', label: 'Pending' },
+                approved: { cls: 'status-badge-approved', icon: 'fa-check-circle', label: 'Approved' },
+                rejected: { cls: 'status-badge-rejected', icon: 'fa-times-circle', label: 'Rejected' },
+            };
+            const s = statusMap[order.status] || statusMap.pending;
+
+            const actionButtons = order.status === 'pending' ? `
+                <div class="flex gap-3 mt-4 pt-4 border-t border-gray-100">
+                    <button onclick="handleOrderAction('${order.id}', 'approved')"
+                        class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i> Approve
+                    </button>
+                    <button onclick="handleOrderAction('${order.id}', 'rejected')"
+                        class="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-2 px-4 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-times"></i> Reject
+                    </button>
+                </div>` : '';
+
+            card.innerHTML = `
+                <div class="flex flex-col md:flex-row md:items-center gap-4">
+                    <img src="${order.laptopImage || ''}" alt="${order.laptopModel}"
+                        class="w-full md:w-28 h-20 object-cover rounded-lg bg-gray-100 flex-shrink-0">
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg">${order.laptopModel}</h3>
+                                <p class="text-xs text-gray-400 font-mono">#${order.id.slice(0, 12)}...</p>
+                            </div>
+                            <span class="${s.cls} px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1 flex-shrink-0">
+                                <i class="fa-solid ${s.icon}"></i> ${s.label}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-gray-600">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase mb-0.5">Student</p>
+                                <p class="font-medium">${order.studentName || order.studentEmail}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase mb-0.5">Duration</p>
+                                <p class="font-medium">${order.duration} Days</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase mb-0.5">Start Date</p>
+                                <p class="font-medium">${order.startDate}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase mb-0.5">Total</p>
+                                <p class="font-bold text-primary">₹${order.totalPrice}</p>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-xs text-gray-500 bg-gray-50 px-3 py-2 rounded-lg">
+                            <i class="fa-solid fa-location-dot mr-1 text-gray-400"></i>
+                            ${order.address}
+                        </div>
+                        ${actionButtons}
+                    </div>
+                </div>`;
+            return card;
+        }
+
+        // Global handler called by inline onclick
+        window.handleOrderAction = async function (orderId, newStatus) {
+            const card = document.getElementById(`order-card-${orderId}`);
+            const buttons = card.querySelectorAll('button[onclick]');
+            buttons.forEach(b => { b.disabled = true; b.classList.add('opacity-60'); });
+
+            const result = await updateOrderStatus(orderId, newStatus);
+            if (result.success) {
+                // Re-render the card by refreshing the whole list
+                loadRentalRequests();
+            } else {
+                alert('Error: ' + result.error);
+                buttons.forEach(b => { b.disabled = false; b.classList.remove('opacity-60'); });
+            }
+        };
+
+        // ── MY INVENTORY ──────────────────────────────────────────────────────────
+        async function loadInventory() {
+            const container = document.getElementById('inventory-container');
+            if (!currentUser) return;
+
+            const allLaptops = await getLaptops();
+            const myLaptops = allLaptops.filter(l => l.vendorId === currentUser.uid);
+
+            container.innerHTML = '';
+
+            if (myLaptops.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-300">
+                        <i class="fa-solid fa-laptop text-gray-300 text-4xl mb-3"></i>
+                        <p class="text-gray-500">You haven't listed any laptops yet.</p>
+                        <p class="text-gray-400 text-sm mt-1">Use the form above to add your first laptop.</p>
+                    </div>`;
+                return;
+            }
+
+            const table = document.createElement('div');
+            table.className = 'bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden';
+            table.innerHTML = `
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                        <tr>
+                            <th class="text-left px-5 py-3">Laptop</th>
+                            <th class="text-left px-5 py-3 hidden md:table-cell">Specs</th>
+                            <th class="text-left px-5 py-3">Price/Day</th>
+                            <th class="text-left px-5 py-3">Status</th>
+                            <th class="text-right px-5 py-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-tbody" class="divide-y divide-gray-100"></tbody>
+                </table>`;
+            container.appendChild(table);
+
+            const tbody = document.getElementById('inventory-tbody');
+            myLaptops.forEach(laptop => {
+                const tr = document.createElement('tr');
+                tr.id = `laptop-row-${laptop.id}`;
+                tr.className = 'hover:bg-gray-50 transition';
+                tr.innerHTML = `
+                    <td class="px-5 py-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${laptop.image}" alt="${laptop.model}"
+                                class="w-12 h-10 object-cover rounded-lg bg-gray-100 flex-shrink-0">
+                            <div>
+                                <p class="font-semibold text-gray-900">${laptop.brand} ${laptop.model}</p>
+                                <p class="text-xs text-gray-400">${laptop.category}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-5 py-4 hidden md:table-cell text-gray-500">
+                        ${laptop.specs.processor} · ${laptop.specs.ram} · ${laptop.specs.storage}
+                    </td>
+                    <td class="px-5 py-4 font-bold text-primary">₹${laptop.price_per_day}</td>
+                    <td class="px-5 py-4">
+                        ${laptop.available
+                        ? '<span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-check mr-1"></i>Available</span>'
+                        : '<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs font-bold"><i class="fa-solid fa-times mr-1"></i>Rented</span>'}
+                    </td>
+                    <td class="px-5 py-4 text-right">
+                        <button onclick="openDeleteModal('${laptop.id}')"
+                            class="text-red-400 hover:text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1 ml-auto">
+                            <i class="fa-solid fa-trash-alt"></i> Delete
+                        </button>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Delete Modal Logic
+        window.openDeleteModal = function (laptopId) {
+            laptopToDelete = laptopId;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        };
+
+        document.getElementById('cancel-delete-btn').addEventListener('click', () => {
+            laptopToDelete = null;
+            document.getElementById('delete-modal').classList.add('hidden');
+        });
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+            if (!laptopToDelete) return;
+            const btn = document.getElementById('confirm-delete-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Deleting...';
+
+            const result = await deleteLaptop(laptopToDelete);
+            if (result.success) {
+                // Remove the row from UI
+                const row = document.getElementById(`laptop-row-${laptopToDelete}`);
+                if (row) row.remove();
+                // If tbody is empty, reload to show empty state
+                const tbody = document.getElementById('inventory-tbody');
+                if (tbody && tbody.children.length === 0) loadInventory();
+            } else {
+                alert('Error: ' + result.error);
+            }
+
+            laptopToDelete = null;
+            document.getElementById('delete-modal').classList.add('hidden');
+            btn.disabled = false;
+            btn.innerHTML = 'Delete';
+        });
+
+        // ── ADD LAPTOP FORM ───────────────────────────────────────────────────────
         document.getElementById('add-laptop-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
@@ -134,22 +493,31 @@
                 price_per_day: parseInt(document.getElementById('price').value),
                 category: document.getElementById('category').value,
                 image: document.getElementById('image').value,
-                vendorId: currentUser ? currentUser.uid : 'test_vendor'
+                vendorId: currentUser ? currentUser.uid : null,
+                vendorName: currentUser ? (currentUser.displayName || currentUser.email) : 'Unknown Vendor'
             };
 
             btn.disabled = true;
-            btn.innerHTML = 'Listing...';
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Listing...';
 
             const result = await addLaptop(laptopData);
 
             if (result.success) {
-                alert("Laptop added successfully!");
                 document.getElementById('add-laptop-form').reset();
+                // Animate success
+                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Listed!';
+                btn.className = btn.className.replace('bg-primary hover:bg-blue-700', 'bg-green-500');
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-upload mr-2"></i>List Laptop';
+                    btn.className = btn.className.replace('bg-green-500', 'bg-primary hover:bg-blue-700');
+                    loadInventory(); // Refresh inventory table
+                }, 2000);
             } else {
-                alert("Error: " + result.error);
+                alert('Error: ' + result.error);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-upload mr-2"></i>List Laptop';
             }
-            btn.disabled = false;
-            btn.innerHTML = 'List Laptop';
         });
     </script>
 </body>

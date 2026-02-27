@@ -1,5 +1,5 @@
 import { db } from './firebase-config.js';
-import { collection, getDocs, doc, getDoc, addDoc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Mock Data for fallback
 const MOCK_LAPTOPS = [
@@ -9,7 +9,7 @@ const MOCK_LAPTOPS = [
         model: "MacBook Air M1",
         specs: { processor: "M1", ram: "8GB", storage: "256GB SSD" },
         price_per_day: 49,
-        image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&q=80&w=1000",
+        image: "https://i.ytimg.com/vi/FarPVvHpARA/maxresdefault.jpg",
         available: true,
         category: "Ultrabook"
     },
@@ -19,7 +19,7 @@ const MOCK_LAPTOPS = [
         model: "XPS 13",
         specs: { processor: "i7 11th Gen", ram: "16GB", storage: "512GB SSD" },
         price_per_day: 59,
-        image: "https://images.unsplash.com/photo-1593642632823-8f78536788c6?auto=format&fit=crop&q=80&w=1000",
+        image: "https://www.notebookcheck.net/fileadmin/Notebooks/News/_nc4/Dell-XPS-13-9340-laptop.JPG",
         available: false,
         category: "Windows Premier"
     },
@@ -155,6 +155,31 @@ async function addLaptop(laptopData) {
     }
 }
 
+// Get orders for a specific vendor (by vendorId stored on the order)
+async function getOrdersByVendor(vendorId) {
+    try {
+        if (!db) return [];
+        const q = query(collection(db, "orders"), where("vendorId", "==", vendorId));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+        console.error("Error fetching vendor orders:", error);
+        return [];
+    }
+}
+
+// Delete a laptop listing
+async function deleteLaptop(laptopId) {
+    try {
+        if (!db) return { success: true };
+        await deleteDoc(doc(db, "laptops", laptopId));
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting laptop:", error);
+        return { success: false, error: error.message };
+    }
+}
+
 // --- Admin Functions ---
 async function getAllOrders() {
     try {
@@ -179,7 +204,7 @@ async function updateOrderStatus(orderId, status) {
     }
 }
 
-export { getLaptops, getLaptopById, createOrder, getOrdersByStudent, addLaptop, getAllOrders, updateOrderStatus, MOCK_LAPTOPS };
+export { getLaptops, getLaptopById, createOrder, getOrdersByStudent, addLaptop, getAllOrders, updateOrderStatus, getOrdersByVendor, deleteLaptop, MOCK_LAPTOPS };
 
 
 
