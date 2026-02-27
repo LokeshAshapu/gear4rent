@@ -4,7 +4,8 @@ import {
     signInWithEmailAndPassword,
     signOut,
     onAuthStateChanged,
-    updateProfile
+    updateProfile,
+    sendEmailVerification
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -17,6 +18,9 @@ async function registerUser(email, password, name, role) {
 
         // 2. Update Display Name
         await updateProfile(user, { displayName: name });
+
+        // Fix #13: Send email verification
+        await sendEmailVerification(user);
 
         // 3. Store User Role in Firestore
         if (db) {

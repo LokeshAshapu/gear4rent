@@ -125,11 +125,23 @@
             const result = await registerUser(email, password, name, role);
 
             if (result.success) {
-                // Redirect to login or home
-                alert("Account created successfully! Redirecting to login...");
-                window.location.href = 'login.html';
+                // Fix #13: Inform user that a verification email was sent
+                const successDiv = document.getElementById('error-msg');
+                successDiv.className = 'text-green-600 text-sm text-center bg-green-50 p-3 rounded border border-green-200';
+                successDiv.innerHTML = `<i class="fa-solid fa-envelope-circle-check mr-1"></i> Account created! A verification email was sent to <strong>${email}</strong>. Please verify before logging in.`;
+                successDiv.classList.remove('hidden');
+                signupBtn.disabled = false;
+                signupBtn.innerHTML = `<span>Create Account</span> <i class="fa-solid fa-user-plus"></i>`;
             } else {
-                errorMsg.textContent = result.error.replace("Firebase: ", "");
+                // Fix #14: Friendly error codes
+                const friendlyErrors = {
+                    'auth/email-already-in-use': 'An account with this email already exists.',
+                    'auth/invalid-email': 'Please enter a valid email address.',
+                    'auth/weak-password': 'Password must be at least 6 characters.',
+                    'auth/network-request-failed': 'Network error. Check your connection.',
+                };
+                const code = result.error.match(/\(([^)]+)\)/)?.[1];
+                errorMsg.textContent = friendlyErrors[code] || 'Sign up failed. Please try again.';
                 errorMsg.classList.remove('hidden');
                 signupBtn.innerHTML = `<span>Create Account</span> <i class="fa-solid fa-user-plus"></i>`;
                 signupBtn.disabled = false;

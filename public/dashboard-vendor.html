@@ -221,7 +221,7 @@
     </div>
 
     <script type="module">
-        import { addLaptop, getLaptops, getOrdersByVendor, updateOrderStatus, deleteLaptop } from './src/js/db.js';
+        import { addLaptop, getLaptopsByVendor, getOrdersByVendor, updateOrderStatus, deleteLaptop } from './src/js/db.js';
         import { monitorAuthState, logoutUser } from './src/js/auth.js';
 
         let currentUser = null;
@@ -375,8 +375,8 @@
             const container = document.getElementById('inventory-container');
             if (!currentUser) return;
 
-            const allLaptops = await getLaptops();
-            const myLaptops = allLaptops.filter(l => l.vendorId === currentUser.uid);
+            // Fix #10: Use a direct Firestore query instead of fetching all laptops
+            const myLaptops = await getLaptopsByVendor(currentUser.uid);
 
             container.innerHTML = '';
 

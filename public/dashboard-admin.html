@@ -66,8 +66,13 @@
         let currentUser = null;
 
         monitorAuthState((user, role) => {
-            if (!user || role !== 'admin') {
-
+            if (!user) {
+                window.location.replace('login.html');
+                return;
+            }
+            if (role !== 'admin') {
+                window.location.replace('index.html');
+                return;
             }
             currentUser = user;
             loadOrders();

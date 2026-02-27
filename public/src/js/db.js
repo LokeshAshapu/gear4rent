@@ -1,5 +1,5 @@
 import { db } from './firebase-config.js';
-import { collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, query, where, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Mock Data for fallback
 const MOCK_LAPTOPS = [
@@ -110,8 +110,28 @@ async function createOrder(orderData) {
             return { success: true, id: "MOCK_ORDER_" + Date.now() };
         }
 
+        // Fix #7: Server-side duration validation
+        const duration = parseInt(orderData.duration);
+        if (isNaN(duration) || duration < 3 || duration > 180) {
+            return { success: false, error: "Rental duration must be between 3 and 180 days." };
+        }
+
+        // Fix #12: Prevent duplicate active orders for the same laptop by the same student
+        const dupQuery = query(
+            collection(db, "orders"),
+            where("studentId", "==", orderData.studentId),
+            where("laptopId", "==", orderData.laptopId),
+            where("status", "==", "pending"),
+            limit(1)
+        );
+        const dupSnap = await getDocs(dupQuery);
+        if (!dupSnap.empty) {
+            return { success: false, error: "You already have a pending request for this laptop." };
+        }
+
         const docRef = await addDoc(collection(db, "orders"), {
             ...orderData,
+            duration: duration,
             createdAt: new Date().toISOString(),
             status: 'pending'
         });
@@ -152,6 +172,19 @@ async function addLaptop(laptopData) {
     } catch (error) {
         console.error("Error adding laptop:", error);
         return { success: false, error: error.message };
+    }
+}
+
+// Fix #10: Get laptops for a specific vendor efficiently using a Firestore query
+async function getLaptopsByVendor(vendorId) {
+    try {
+        if (!db) return [];
+        const q = query(collection(db, "laptops"), where("vendorId", "==", vendorId));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch (error) {
+        console.error("Error fetching vendor laptops:", error);
+        return [];
     }
 }
 
@@ -197,6 +230,31 @@ async function updateOrderStatus(orderId, status) {
         if (!db) return { success: true };
         const orderRef = doc(db, "orders", orderId);
         await updateDoc(orderRef, { status: status });
+
+        // Fix #5: When an order is approved, mark the laptop as unavailable
+        if (status === 'approved') {
+            const orderSnap = await getDoc(orderRef);
+            if (orderSnap.exists()) {
+                const laptopId = orderSnap.data().laptopId;
+                if (laptopId) {
+                    const laptopRef = doc(db, "laptops", laptopId);
+                    await updateDoc(laptopRef, { available: false });
+                }
+            }
+        }
+
+        // If an order is rejected/cancelled, re-mark the laptop as available
+        if (status === 'rejected') {
+            const orderSnap = await getDoc(orderRef);
+            if (orderSnap.exists()) {
+                const laptopId = orderSnap.data().laptopId;
+                if (laptopId) {
+                    const laptopRef = doc(db, "laptops", laptopId);
+                    await updateDoc(laptopRef, { available: true });
+                }
+            }
+        }
+
         return { success: true };
     } catch (error) {
         console.error("Error updating order:", error);
@@ -204,7 +262,7 @@ async function updateOrderStatus(orderId, status) {
     }
 }
 
-export { getLaptops, getLaptopById, createOrder, getOrdersByStudent, addLaptop, getAllOrders, updateOrderStatus, getOrdersByVendor, deleteLaptop, MOCK_LAPTOPS };
+export { getLaptops, getLaptopById, createOrder, getOrdersByStudent, addLaptop, getAllOrders, updateOrderStatus, getOrdersByVendor, getLaptopsByVendor, deleteLaptop, MOCK_LAPTOPS };
 
 
 

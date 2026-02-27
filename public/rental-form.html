@@ -161,19 +161,28 @@
         let selectedLaptop = null;
 
         // Auth Check
-        monitorAuthState((user) => {
+        monitorAuthState((user, role) => {
             if (!user) {
-                // Not logged in, redirect
                 window.location.replace(`login.html?redirect=rental-form.html?id=${laptopId}`);
+                return;
+            }
+            // Fix #9: Block vendor/admin from renting (only students should rent)
+            if (role === 'admin') {
+                window.location.replace('dashboard-admin.html');
+                return;
             }
             currentUser = user;
         });
 
         // Initialize
         async function init() {
-            if (!laptopId) return;
+            if (!laptopId) {
+                alert("No laptop selected.");
+                window.location.href = 'index.html';
+                return;
+            }
 
-            // Set Date Date min to today
+            // Set Date min to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('start-date').min = today;
             document.getElementById('start-date').value = today;
@@ -182,6 +191,13 @@
             selectedLaptop = await getLaptopById(laptopId);
             if (!selectedLaptop) {
                 alert("Invalid Laptop ID");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Fix #9: Check if laptop is still available
+            if (selectedLaptop.available === false) {
+                alert("Sorry, this laptop is currently rented out and not available.");
                 window.location.href = 'index.html';
                 return;
             }
@@ -231,7 +247,12 @@
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...`;
 
-            // Prepare Order Data
+            // Prepare Order Data — Fix #6: Recalculate price in JS, never trust DOM value
+            const daysClean = parseInt(duration);
+            const rawTotal = selectedLaptop.price_per_day * daysClean;
+            const discount = Math.round(rawTotal * 0.10);
+            const finalTotal = rawTotal - discount;
+
             const orderData = {
                 studentId: currentUser.uid,
                 studentEmail: currentUser.email,
@@ -242,8 +263,8 @@
                 laptopImage: selectedLaptop.image,
                 vendorId: selectedLaptop.vendorId || null,
                 startDate: startDate,
-                duration: parseInt(duration),
-                totalPrice: parseInt(document.getElementById('total-price').innerText),
+                duration: daysClean,
+                totalPrice: finalTotal,   // Fix #6: Calculated server-side in JS, not from DOM
                 purpose: purpose,
                 address: address
             };

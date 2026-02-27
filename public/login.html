@@ -104,7 +104,17 @@
                     window.location.href = 'index.html'; // Student
                 }
             } else {
-                errorMsg.textContent = result.error.replace("Firebase: ", "");
+                // Fix #14: Friendly error codes — don't leak Firebase internals
+                const friendlyErrors = {
+                    'auth/user-not-found': 'No account found with this email.',
+                    'auth/wrong-password': 'Incorrect password. Please try again.',
+                    'auth/invalid-email': 'Please enter a valid email address.',
+                    'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
+                    'auth/invalid-credential': 'Invalid email or password.',
+                    'auth/network-request-failed': 'Network error. Check your connection.',
+                };
+                const code = result.error.match(/\(([^)]+)\)/)?.[1];
+                errorMsg.textContent = friendlyErrors[code] || 'Sign in failed. Please check your details.';
                 errorMsg.classList.remove('hidden');
                 loginBtn.innerHTML = `<span>Sign In</span> <i class="fa-solid fa-arrow-right"></i>`;
                 loginBtn.disabled = false;
