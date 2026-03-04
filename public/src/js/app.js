@@ -5,6 +5,9 @@ import { monitorAuthState, logoutUser } from './auth.js';
 const laptopGrid = document.getElementById('laptop-grid');
 const authButtons = document.getElementById('auth-buttons');
 
+// Filter state — all laptops cached here so filters work without re-fetching
+let allLaptops = [];
+
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Check Auth State
@@ -28,10 +31,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // watchLaptops fires immediately on load AND every time any laptop changes in Firestore
         watchLaptops((laptops) => {
-            renderLaptopGrid(laptops);
+            allLaptops = laptops;
+            applyFilters();
         });
+
+        // Wire up filter controls
+        initFilters();
     }
 });
+
+// ─── Filter Logic ────────────────────────────────────────────────────────────
+
+function initFilters() {
+    const searchInput = document.getElementById('search-input');
+    const ramSelect = document.getElementById('filter-ram');
+    const categorySelect = document.getElementById('filter-category');
+    const availCheckbox = document.getElementById('filter-available');
+    const resetBtn = document.getElementById('reset-filters');
+
+    if (!searchInput) return; // filter bar not present on this page
+
+    // Any change triggers a re-render
+    searchInput.addEventListener('input', applyFilters);
+    ramSelect.addEventListener('change', applyFilters);
+    categorySelect.addEventListener('change', applyFilters);
+    availCheckbox.addEventListener('change', applyFilters);
+
+    resetBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        ramSelect.value = '';
+        categorySelect.value = '';
+        availCheckbox.checked = false;
+        applyFilters();
+    });
+}
+
+function applyFilters() {
+    const query = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
+    const ram = (document.getElementById('filter-ram')?.value || '').toLowerCase();
+    const category = (document.getElementById('filter-category')?.value || '').toLowerCase();
+    const availOnly = document.getElementById('filter-available')?.checked || false;
+
+    let filtered = allLaptops.filter(laptop => {
+        // Text search: brand or model
+        if (query) {
+            const haystack = `${laptop.brand} ${laptop.model}`.toLowerCase();
+            if (!haystack.includes(query)) return false;
+        }
+
+        // RAM filter: match if the laptop's ram field contains the selected value (e.g. "16GB")
+        if (ram) {
+            const laptopRam = (laptop.specs?.ram || '').toLowerCase();
+            if (!laptopRam.includes(ram)) return false;
+        }
+
+        // Category filter: keyword substring match (e.g. "gaming" matches "Gaming/High Performance")
+        if (category) {
+            const laptopCat = (laptop.category || '').toLowerCase();
+            if (!laptopCat.includes(category)) return false;
+        }
+
+        // Availability filter
+        if (availOnly && !laptop.available) return false;
+
+        return true;
+    });
+
+    renderLaptopGrid(filtered, allLaptops.length);
+}
+
+// ─── Auth Nav ────────────────────────────────────────────────────────────────
 
 function updateNavForLoggedInUser(user, role) {
     if (!authButtons) return;
@@ -77,11 +146,27 @@ function updateNavForGuest() {
 }
 
 // Render Laptops to Grid
-function renderLaptopGrid(laptops) {
+function renderLaptopGrid(laptops, total = null) {
     laptopGrid.innerHTML = '';
 
+    // Update result count label
+    const countEl = document.getElementById('filter-result-count');
+    if (countEl) {
+        if (total !== null && total !== laptops.length) {
+            countEl.textContent = `Showing ${laptops.length} of ${total} laptop${total !== 1 ? 's' : ''}`;
+            countEl.classList.remove('hidden');
+        } else {
+            countEl.classList.add('hidden');
+        }
+    }
+
     if (!laptops || laptops.length === 0) {
-        laptopGrid.innerHTML = '<p class="text-center col-span-full text-gray-500">No laptops available at the moment.</p>';
+        laptopGrid.innerHTML = `
+            <div class="col-span-full text-center py-16 text-gray-400">
+                <i class="fa-solid fa-laptop-slash text-4xl mb-4 block"></i>
+                <p class="font-medium text-gray-600">No laptops match your filters.</p>
+                <p class="text-sm mt-1">Try adjusting your search or <button onclick="document.getElementById('reset-filters').click()" class="text-primary underline">reset filters</button>.</p>
+            </div>`;
         return;
     }
 
