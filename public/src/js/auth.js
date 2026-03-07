@@ -46,6 +46,15 @@ async function loginUser(email, password) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
+        // 🔒 Email verification check
+        if (!user.emailVerified) {
+            await signOut(auth); // Sign them back out immediately
+            return {
+                success: false,
+                error: "Please verify your email before logging in. Check your inbox for the verification link."
+            };
+        }
+
         // Fetch Role
         let role = 'student'; // Default
         if (db) {

@@ -104,7 +104,7 @@
                     window.location.href = 'index.html'; // Student
                 }
             } else {
-                // Fix #14: Friendly error codes — don't leak Firebase internals
+                // Friendly error messages — don't leak Firebase internals
                 const friendlyErrors = {
                     'auth/user-not-found': 'No account found with this email.',
                     'auth/wrong-password': 'Incorrect password. Please try again.',
@@ -114,7 +114,10 @@
                     'auth/network-request-failed': 'Network error. Check your connection.',
                 };
                 const code = result.error.match(/\(([^)]+)\)/)?.[1];
-                errorMsg.textContent = friendlyErrors[code] || 'Sign in failed. Please check your details.';
+                // If there's a known Firebase code, map it; otherwise show the message directly
+                errorMsg.textContent = code
+                    ? (friendlyErrors[code] || 'Sign in failed. Please check your details.')
+                    : result.error;
                 errorMsg.classList.remove('hidden');
                 loginBtn.innerHTML = `<span>Sign In</span> <i class="fa-solid fa-arrow-right"></i>`;
                 loginBtn.disabled = false;
