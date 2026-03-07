@@ -16,22 +16,20 @@ async function registerUser(email, password, name, role) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // 2. Update Display Name
+        // 2. Update Display Name in Auth profile
         await updateProfile(user, { displayName: name });
 
-        // Fix #13: Send email verification
+        // 3. Send email verification
         await sendEmailVerification(user);
 
-        // 3. Store User Role in Firestore
-        if (db) {
-            await setDoc(doc(db, "users", user.uid), {
-                uid: user.uid,
-                name: name,
-                email: email,
-                role: role,
-                createdAt: new Date().toISOString()
-            });
-        }
+        // 4. Sign out immediately — user must verify before logging in
+        await signOut(auth);
+
+        // 5. Temporarily save name & role in sessionStorage so we can
+        //    create the Firestore doc on their FIRST verified login.
+        //    (No Firestore write here — avoids wasted storage for unverified accounts)
+        sessionStorage.setItem('pendingUserName', name);
+        sessionStorage.setItem('pendingUserRole', role);
 
         return { success: true, user };
     } catch (error) {
@@ -55,16 +53,36 @@ async function loginUser(email, password) {
             };
         }
 
-        // Fetch Role
+        // Fetch or CREATE Firestore profile
         let role = 'student'; // Default
         if (db) {
             try {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
+                const userRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userRef);
+
                 if (userDoc.exists()) {
+                    // Profile already exists — just read the role
                     role = userDoc.data().role;
+                } else {
+                    // First verified login — create the Firestore doc now
+                    const name = sessionStorage.getItem('pendingUserName') || user.displayName || 'User';
+                    role = sessionStorage.getItem('pendingUserRole') || 'student';
+
+                    await setDoc(userRef, {
+                        uid: user.uid,
+                        name: name,
+                        email: user.email,
+                        role: role,
+                        emailVerified: true,
+                        createdAt: new Date().toISOString()
+                    });
+
+                    // Clean up temporary storage
+                    sessionStorage.removeItem('pendingUserName');
+                    sessionStorage.removeItem('pendingUserRole');
                 }
             } catch (e) {
-                console.warn("Could not fetch user role from Firestore, defaulting to student:", e.message);
+                console.warn("Could not fetch/create user profile in Firestore:", e.message);
             }
         }
 
